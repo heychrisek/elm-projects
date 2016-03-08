@@ -59,6 +59,7 @@ defaultGame =
 
 type alias Input =
   { space : Bool
+  , shift : Bool
   , dir1 : Int
   , dir2 : Int
   , delta : Time
@@ -68,7 +69,7 @@ type alias Input =
 -- UPDATE
 
 update : Input -> Game -> Game
-update {space,dir1,dir2,delta} ({state,ball,player1,player2} as game) =
+update {space,shift,dir1,dir2,delta} ({state,ball,player1,player2} as game) =
   let
     score1 =
       if ball.x > halfWidth then 1 else 0
@@ -79,6 +80,9 @@ update {space,dir1,dir2,delta} ({state,ball,player1,player2} as game) =
     newState =
       if space then
           Play
+
+      else if shift then
+          Pause
 
       else if score1 /= score2 then
           Pause
@@ -161,6 +165,8 @@ view (w,h) game =
     collage gameWidth gameHeight
       [ rect gameWidth gameHeight
           |> filled pongGreen
+      , rect 1 gameHeight
+          |> filled white
       , oval 15 15
           |> make game.ball
       , rect 10 40
@@ -190,7 +196,7 @@ txt f string =
     |> leftAligned
 
 
-msg = "SPACE to start, WS and &uarr;&darr; to move"
+msg = "SPACE to start/unpause, WS and &uarr;&darr; to move, SHIFT to pause"
 
 make obj shape =
   shape
@@ -216,8 +222,9 @@ delta =
 input : Signal Input
 input =
   Signal.sampleOn delta <|
-    Signal.map4 Input
+    Signal.map5 Input
       Keyboard.space
+      Keyboard.shift
       (Signal.map .y Keyboard.wasd)
       (Signal.map .y Keyboard.arrows)
       delta
