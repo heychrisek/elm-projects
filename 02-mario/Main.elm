@@ -51,7 +51,7 @@ update (dt, keys) mario =
 jump : Keys -> Model -> Model
 jump keys mario =
   if keys.y > 0 && mario.vy == 0 then
-      { mario | vy = 12.0 }
+      { mario | vy = 8.0 }
 
   else
       mario
